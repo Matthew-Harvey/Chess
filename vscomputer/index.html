@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Chess</title>
+		<link rel="shortcut icon" href="img/icon.png">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<header id="header">
+				<h1>Chess</h1>
+				<nav>
+					<ul>
+						<li><a href="https://matthew-harvey.github.io/chess">Home</a></li>
+						<li><a href="https://matthew-harvey.github.io/chess/2player">2 Player</a></li>
+						<li><a href="https://matthew-harvey.github.io/chess/puzzle">Puzzles</a></li>
+						<li><a href="https://matthew-harvey.github.io/chess/vscomputer">VS Computer</a></li>
+						<li><a href="https://matthew-harvey.github.io/chess/2bots">2 Bots</a></li>
+						<li><a href="https://matthew-harvey.github.io/chess/contact">Contact</a></li>
+					</ul>
+				</nav>
+			</header>
+
+			<section id="work" class="main style3 primary">
+				<div class="content">
+					<header>
+						<h2>Play VS Computer</h2>
+						<p>Play Now!</p>
+						<button id="startPositionBtn">Reset</button>
+						<button id="flipOrientationBtn">Flip</button>
+						<br></br>
+						<div id="chessboard" style="width: 100%"></div>
+						<br></br>
+						<label>Status:</label>
+						<div id=status></div>
+						<br></br>
+						<label>Position:</label>
+						<div id=fen></div>
+					</header>
+
+					<link rel="stylesheet" href="assets/css/chessboard-1.0.0.min.css">
+					<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+					<script src="assets/js/chessboard-1.0.0.min.js"></script>
+					<script src="assets/js/chess.js"></script>
+
+					<script>
+						var board = null
+						var game = new Chess()
+						var $status = $('#status')
+						var $fen = $('#fen')
+						var $pgn = $('#pgn')
+
+						function onDragStart (source, piece, position, orientation) {
+						// do not pick up pieces if the game is over
+						if (game.game_over()) return false
+
+						// only pick up pieces for White
+						if (piece.search(/^b/) !== -1) return false
+						}
+
+						function makeRandomMove () {
+						var possibleMoves = game.moves()
+
+						// game over
+						if (possibleMoves.length === 0) return
+
+						var randomIdx = Math.floor(Math.random() * possibleMoves.length)
+						game.move(possibleMoves[randomIdx])
+						updateStatus()
+						board.position(game.fen())
+						}
+
+						function onDrop (source, target) {
+						// see if the move is legal
+						var move = game.move({
+							from: source,
+							to: target,
+							promotion: 'q' // NOTE: always promote to a queen for example simplicity
+						})
+
+						// illegal move
+						if (move === null) return 'snapback'
+
+						updateStatus()
+
+						// make random legal move for black
+						window.setTimeout(makeRandomMove, 250)
+
+						}
+
+						// update the board position after the piece snap
+						// for castling, en passant, pawn promotion
+						function onSnapEnd () {
+						board.position(game.fen())
+						}
+
+						function updateStatus () {
+						var status = ''
+
+						var moveColor = 'White'
+						if (game.turn() === 'b') {
+							moveColor = 'Black'
+						}
+
+						// checkmate?
+						if (game.in_checkmate()) {
+							status = 'Game over, ' + moveColor + ' is in checkmate.'
+						}
+
+						// draw?
+						else if (game.in_draw()) {
+							status = 'Game over, drawn position'
+						}
+
+						// game still on
+						else {
+							status = moveColor + ' to move'
+
+							// check?
+							if (game.in_check()) {
+							status += ', ' + moveColor + ' is in check'
+							}
+						}
+
+						$status.html(status)
+						$fen.html(game.fen())
+						$pgn.html(game.pgn())
+						}
+
+						var config = {
+						draggable: true,
+						position: 'start',
+						onDragStart: onDragStart,
+						onDrop: onDrop,
+						onSnapEnd: onSnapEnd
+						}
+						board = Chessboard('chessboard', config)
+
+						updateStatus()
+						
+						$('#startPositionBtn').on('click', board.start)
+
+						$('#flipOrientationBtn').on('click', board.flip)
+
+					</script>
+				</div>
+			</section>
+
+		<!-- Footer -->
+			<footer id="footer">
+
+				<!-- Icons -->
+					<ul class="icons">
+						<li><a href="https://www.linkedin.com/in/m-harvey/" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+						<li><a href="https://github.com/Matthew-Harvey" class="icon brands fa-github"><span class="label">Github</span></a></li>
+					</ul>
+
+				<!-- Menu -->
+					<ul class="menu">
+						<li><a href="https://matthew-harvey.github.io">&copy; Matthew Harvey 2020</a></li>
+					</ul>
+
+			</footer>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.poptrox.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

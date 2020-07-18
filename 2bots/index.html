@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-        <title>Chess</title>
-        <link rel="shortcut icon" href="img/icon.png">
+		<title>Chess</title>
+		<link rel="shortcut icon" href="img/icon.png">
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -28,26 +28,84 @@
 			<section id="work" class="main style3 primary">
 				<div class="content">
 					<header>
-                        <h2>Home</h2>
-                        <img src="img/icon.png" width="10%" height="10%">
-						<p>Play Chess Today!</p>
-						<p>This site is built using Chess.js and Chessboard.js libaries integrated together. You can play 2-Player, Vs Computer or watch the worst game of chess you will ever see!</p>
+						<h2>2 Bots Playing Chess</h2>
+						<p>Watch the worst game of chess now!</p>
+						<br></br>
+						<div id="chessboard" style="width: 100%"></div>
+						<br></br>
+						<label>Status:</label>
+						<div id=status></div>
+						<br></br>
+						<label>Position:</label>
+						<div id=fen></div>
 					</header>
-				</div>
-			</section>
 
-			<section id="one" class="main style3 primary">
-				<div class="content">
-                    <div class="row">
-						<div class="column">
-							<p>Here is the latest Puzzle available on Chess.com!</p>
-							<img alt="Daily Puzzle" class="daily-puzzle-board" data-src="https://www.chess.com/dynboard?fen=r2q1rk1/2R2ppp/5n2/1N1pQ3/1b6/1B1P4/5PPP/5RK1&amp;flip=1&amp;size=2" data-srcset="https://www.chess.com/dynboard?fen=r2q1rk1/2R2ppp/5n2/1N1pQ3/1b6/1B1P4/5PPP/5RK1&amp;flip=1&amp;size=3 2x" src="https://www.chess.com/dynboard?fen=r2q1rk1/2R2ppp/5n2/1N1pQ3/1b6/1B1P4/5PPP/5RK1&amp;flip=1&amp;size=2" srcset="https://www.chess.com/dynboard?fen=r2q1rk1/2R2ppp/5n2/1N1pQ3/1b6/1B1P4/5PPP/5RK1&amp;flip=1&amp;size=3 2x">
-							<h3>Daily Puzzle From <a href="https://chess.com" target="_blank">Chess.com</a></h3>
-							<form action="https://www.chess.com/goto_daily_puzzle" target="_blank">
-								<button type="submit">Complete Puzzle</button>
-							</form>
-						</div>
-					  </div>
+					<link rel="stylesheet" href="assets/css/chessboard-1.0.0.min.css">
+					<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+					<script src="assets/js/chessboard-1.0.0.min.js"></script>
+					<script src="assets/js/chess.js"></script>
+
+					<script>
+						var board = null
+						var game = new Chess()
+						var $status = $('#status')
+						var $fen = $('#fen')
+						var $pgn = $('#pgn')
+
+						function makeRandomMove () {
+						var possibleMoves = game.moves()
+
+						// exit if the game is over
+						if (game.game_over()) return
+
+						var randomIdx = Math.floor(Math.random() * possibleMoves.length)
+						game.move(possibleMoves[randomIdx])
+						updateStatus()
+						board.position(game.fen())
+
+						window.setTimeout(makeRandomMove, 500)
+						}
+
+						function updateStatus () {
+						var status = ''
+
+						var moveColor = 'White'
+						if (game.turn() === 'b') {
+							moveColor = 'Black'
+						}
+
+						// checkmate?
+						if (game.in_checkmate()) {
+							status = 'Game over, ' + moveColor + ' is in checkmate.'
+						}
+
+						// draw?
+						else if (game.in_draw()) {
+							status = 'Game over, drawn position'
+						}
+
+						// game still on
+						else {
+							status = moveColor + ' to move'
+
+							// check?
+							if (game.in_check()) {
+							status += ', ' + moveColor + ' is in check'
+							}
+						}
+
+						$status.html(status)
+						$fen.html(game.fen())
+						$pgn.html(game.pgn())
+						}
+
+						board = Chessboard('chessboard', 'start')
+
+						window.setTimeout(makeRandomMove, 500)
+
+						updateStatus()
+
+					</script>
 				</div>
 			</section>
 

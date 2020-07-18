@@ -66,6 +66,14 @@ input, select, textarea {
 	appearance: none;
 }
 
+li:hover:after {
+    content: "";
+    display: block;
+    width: 10px;
+    border-bottom: 2px solid;
+    margin: 0 auto;
+}
+
 .row {
 	display: flex;
 	justify-content: space-between
